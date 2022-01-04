@@ -1,4 +1,9 @@
-main : main.o
-	cc -o main main.o
-main.o :  src/main.c includes/errors.h
-	cc -c -g src/main.c
+objs = main.o
+VPATH = src:includes
+
+main : $(objs)
+	cc -o main $(objs)
+main.o :  errors.h
+.PHONY : clean
+clean :
+	rm main $(objs)
