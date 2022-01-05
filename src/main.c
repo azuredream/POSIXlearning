@@ -2,12 +2,16 @@
 #include <pthread.h>
 
 #include "../includes/errors.h"
+#include "../includes/tprint.h"
+
+int RUNLV = 2;  //0: err, 1: warn, 2: msg
 
 pthread_cond_t cond;
 
 int main(int argc, char *argv[])
 {
-    printf("hello world");
+    lprint_msg("hello world", RUNLV);
+
     pthread_condattr_t cond_attr;
     int status;
          status = pthread_condattr_init(&cond_attr);
