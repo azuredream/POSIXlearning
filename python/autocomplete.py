@@ -30,26 +30,33 @@ ncompleter = NestedCompleter.from_nested_dict({
     'symcli':{},
 })
 
-# text = prompt('# ', completer=ncompleter)
-# print('You said: %s' % text)
+class MyCompleter(Completer):
+    def get_completions(self, document, complete_event):
+        for i in range(5):
+            yield Completion('completion' + str(math.floor(random.random()*10)), start_position=0)
 
-# class MyCustomCompleter(Completer):
-#     def get_completions(self, document, complete_event):
-#         yield Completion('completion' + str(math.floor(random.random()*10)), start_position=0)
 
-# text = prompt('> ', completer=MyCustomCompleter())
+#OOP version of global list history[]
+class HistoryKeeper():
+    def __init__(self) -> None:
+        self.history = []
 
-# session = PromptSession()
+    def put_history(self, str):
+        self.history.append(str)
 
-def gethistory():
-    # get this list from a file or secli session
-    return ["I have a dog", "my name is zzx", "I want to have a cat", "Hello world", "I want to have a dog"]
+    def get_history(self):
+        # get this list from a file or secli session
+        return self.history
 
-class mySuggestion(AutoSuggest):
+class MySuggestion(AutoSuggest):
+    def __init__(self, **kwargs) -> None:
+        super().__init__()
+        self.historykeeper = kwargs["historykeeper"] if "historykeeper" in kwargs else None
+
     def get_suggestion(
         self, buffer: "Buffer", document: Document
     ) -> Optional[Suggestion]:
-        history = gethistory()
+        history = self.historykeeper.get_history()
 
         # Consider only the last line for the suggestion.
         text = document.text.rsplit("\n", 1)[-1]
@@ -64,7 +71,15 @@ class mySuggestion(AutoSuggest):
 
         return None
 
+def main():
+    historykeeper = HistoryKeeper()
+    while True:
+        text = prompt('> ', completer=MyCompleter(), auto_suggest=MySuggestion(historykeeper = historykeeper))
+        historykeeper.put_history(text)
+        if (text == "quit"):
+            print("cli exit...")
+            break
+        print('You said: %s' % text)
 
-while True:
-    text = prompt('> ', completer = ncompleter ,auto_suggest=mySuggestion())
-    print('You said: %s' % text)
+if __name__ == '__main__':
+    main()
