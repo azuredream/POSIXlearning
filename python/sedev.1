@@ -1,0 +1,29 @@
+# Comment line     starts with #
+# Line 1: command
+# Line 2: act1, act2, act3 ...
+# option           starts with -
+# arg              starts with >
+# free arg         >!
+# select arg       >|xxx|xxx|xxx|...
+# resource arg     >?server
+# 
+dev
+create, remove
+{>?server:
+    {create: 
+        {-num: {>!,}, 
+        {-size: {>!,}
+    },
+    {remove:
+        {-group: {>?group},}, 
+        {-dev: {>?device,},
+},
+
+>?server
+        create -num >! -size >!
+        remove -dev >?device -group >?group
+
+搜索server可以，dev太多，没法逐一显示。
+两种写法，第二种简洁，但是需要手动处理options的并列关系。还算可以接受
+
+         
