@@ -29,11 +29,10 @@ ncompleter = NestedCompleter.from_nested_dict({
 })
 
 class IndexNavigator():
-    def __init__(self, indexdoc) -> None:
-        self.context = "" #string of the index document
+    def __init__(self, idoc) -> None:
+        self.context = idoc #string of the index document
         self.i       = 0  #cursor position in the document
-        with open(indexdoc) as f:
-            self.context = f.readlines()
+
 
 
 
@@ -44,6 +43,9 @@ class MyCompleter(Completer):
         
     def get_completions(self, document, complete_event):
 #考虑每次根据doc新建nav还是一行命令用一个nav
+#不需要每次多输入一个字符就重新检索文档，所以不需要每次根据doc重建建立
+#MyCompleter的生命周期是一行命令一个
+#在此期间应该保持光标位置的持续移动
 
         for i in range(5):
             yield Completion('completion' + str(math.floor(random.random()*10)), start_position=0)
@@ -103,10 +105,13 @@ class MySuggestion(AutoSuggest):
         return None
 
 def main():
+    indexpath = "./doc/dev.ix"
+    idoc = ""
     historykeeper = HistoryKeeper()
-    indexnav      = IndexNavigator("./doc/dev.ix")
+    with open(indexpath) as f:
+        idoc = f.readlines()
     while True:
-        text = prompt('> ', completer=MyCompleter(indexnav), auto_suggest=MySuggestion(historykeeper = historykeeper))
+        text = prompt('> ', completer=MyCompleter(IndexNavigator(idoc)), auto_suggest=MySuggestion(historykeeper = historykeeper))
         historykeeper.put_history(text)
         if (text == "quit"):
             print("cli exit...")
